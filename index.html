@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Website</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 700px;
+            width: 100%;
+            padding: 40px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .welcome-text {
+            text-align: center;
+            color: #555;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+        }
+
+        .question-number {
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .question-text {
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .code-example {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            border-left: 4px solid #667eea;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .option input[type="radio"] {
+            margin-right: 12px;
+            margin-top: 3px;
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        .option label {
+            cursor: pointer;
+            flex: 1;
+            line-height: 1.5;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .result-item {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-item.correct {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+
+        .result-item.incorrect {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+
+        .result-label {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .result-status {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .result-status.correct {
+            color: #28a745;
+            background: #d4edda;
+        }
+
+        .result-status.incorrect {
+            color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .result-answer {
+            color: #333;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin-bottom: 10px;
+        }
+
+        .correct-answer-section {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .correct-answer-label {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 8px;
+        }
+
+        .correct-answer-text {
+            color: #333;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .score-summary {
+            text-align: center;
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .score-number {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .score-text {
+            font-size: 18px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .question-text {
+                font-size: 15px;
+            }
+
+            .btn {
+                padding: 12px 30px;
+                font-size: 15px;
+            }
+
+            .score-number {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Welcome Page -->
+        <div id="welcomePage">
+            <h1>🎯 Programming Quiz</h1>
+            <p class="welcome-text">
+                Welcome to ABDUL's quiz! Test your programming knowledge and logical reasoning skills. 
+                This quiz contains 2 questions that will challenge your problem-solving abilities.
+                <br><br>
+                Ready to begin? Click the button below to start!
+            </p>
+            <button class="btn" onclick="startQuiz()">Start Quiz</button>
+        </div>
+
+        <!-- Quiz Page -->
+        <div id="quizPage" class="hidden">
+            <h1>Quiz Questions</h1>
+            
+            <!-- Question 1 -->
+            <div class="question-container">
+                <div class="question-number">Question 1:</div>
+                <div class="question-text">
+                    Write a program to print the following pattern based on the alphabet.
+                    <br><br>
+                    <strong>Example 1:</strong> Input: E
+                    <div class="code-example">Output:
+E
+DDDD
+CCC
+BB
+A</div>
+                    
+                    <strong>Example 2:</strong> Input: C
+                    <div class="code-example">Output:
+C
+BB
+A</div>
+                    
+                    <strong>Provide your answer in Java or Python:</strong>
+                </div>
+                <textarea id="answer1" placeholder="Write your code here..."></textarea>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question-container">
+                <div class="question-number">Question 2:</div>
+                <div class="question-text">
+                    If dinner is served on the same day as plants are watered, which of the following is correct?
+                </div>
+                <div class="options">
+                    <div class="option">
+                        <input type="radio" id="q2a" name="question2" value="A">
+                        <label for="q2a">A. Plants are watered on Tuesday.</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q2b" name="question2" value="B">
+                        <label for="q2b">B. Floors are polished on Thursday.</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q2c" name="question2" value="C">
+                        <label for="q2c">C. Plants are watered on Wednesday.</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q2d" name="question2" value="D">
+                        <label for="q2d">D. Floors are polished on Wednesday.</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q2e" name="question2" value="E">
+                        <label for="q2e">E. Plants are watered on Saturday.</label>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn" onclick="submitQuiz()">Submit Quiz</button>
+        </div>
+
+        <!-- Result Page -->
+        <div id="resultPage" class="hidden">
+            <h1>📊 Quiz Results</h1>
+            
+            <div class="score-summary">
+                <div class="score-text">Your Score</div>
+                <div class="score-number" id="scoreDisplay">0/2</div>
+                <div class="score-text" id="scorePercentage">0%</div>
+            </div>
+            
+            <div class="result-item" id="result1Container">
+                <div class="result-label">Question 1: Programming Pattern</div>
+                <div class="result-status" id="status1"></div>
+                <div style="margin-bottom: 10px;"><strong>Your Answer:</strong></div>
+                <div class="result-answer" id="result1"></div>
+                <div class="correct-answer-section" id="correct1" style="display: none;">
+                    <div class="correct-answer-label">✓ Correct Answer:</div>
+                    <div class="correct-answer-text" id="correctAnswer1"></div>
+                </div>
+            </div>
+
+            <div class="result-item" id="result2Container">
+                <div class="result-label">Question 2: Logical Reasoning</div>
+                <div class="result-status" id="status2"></div>
+                <div style="margin-bottom: 10px;"><strong>Your Answer:</strong></div>
+                <div class="result-answer" id="result2"></div>
+                <div class="correct-answer-section" id="correct2" style="display: none;">
+                    <div class="correct-answer-label">✓ Correct Answer:</div>
+                    <div class="correct-answer-text" id="correctAnswer2"></div>
+                </div>
+            </div>
+
+            <button class="btn" onclick="restartQuiz()">Take Quiz Again</button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // EDIT CORRECT ANSWERS HERE
+        // ============================================
+        const correctAnswers = {
+            question1: {
+                // For coding questions, you can check if the answer contains key elements
+                // Or set to null to manually grade, or provide the exact expected answer
+                checkAnswer: function(userAnswer) {
+                    // This is a flexible check - returns true if answer contains certain keywords
+                    const answer = userAnswer.toLowerCase();
+                    const hasLoop = answer.includes('for') || answer.includes('while') || answer.includes('range');
+                    const hasChar = answer.includes('char') || answer.includes('chr') || answer.includes('ord');
+                    const hasPrint = answer.includes('print') || answer.includes('system.out');
+                    
+                    // You can customize this logic based on what you want to check
+                    return hasLoop && (hasChar || hasPrint);
+                },
+                correctAnswerText: `Java Solution:
+import java.util.Scanner;
+public class AlphabetPattern {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter an uppercase alphabet: ");
+        char input = sc.next().charAt(0);
+        for (char ch = input; ch >= 'A'; ch--) {
+            int count;
+            if (ch == input) {
+                count = 1;
+            } else {
+                count = (ch - 'A') + 1;
+            }
+            for (int i = 0; i < count; i++) {
+                System.out.print(ch);
+            }
+            System.out.println();
+        }
+        sc.close();
+    }
+}
+
+Python Solution:
+def print_pattern(ch):
+    for c in range(ord(ch), ord('A') - 1, -1):
+        if c == ord(ch):
+            count = 1
+        else:
+            count = (c - ord('A')) + 1
+        print(chr(c) * count)
+
+char = input("Enter an uppercase alphabet: ").strip().upper()
+print_pattern(char)`
+            },
+            question2: {
+                correctOption: "B", // Change this to the correct option letter
+                correctAnswerText: "B. Floors are polished on Thursday."
+            }
+        };
+
+        // Function to start the quiz
+        function startQuiz() {
+            document.getElementById('welcomePage').classList.add('hidden');
+            document.getElementById('quizPage').classList.remove('hidden');
+        }
+
+        // Function to submit the quiz
+        function submitQuiz() {
+            // Get answers
+            const answer1 = document.getElementById('answer1').value;
+            const answer2Element = document.querySelector('input[name="question2"]:checked');
+
+            // Validate answers
+            if (!answer1.trim()) {
+                alert('Please provide an answer for Question 1');
+                return;
+            }
+
+            if (!answer2Element) {
+                alert('Please select an answer for Question 2');
+                return;
+            }
+
+            const answer2 = answer2Element.value;
+
+            // Check answers
+            let score = 0;
+            
+            // Check Question 1
+            const isQ1Correct = correctAnswers.question1.checkAnswer(answer1);
+            if (isQ1Correct) {
+                score++;
+                document.getElementById('status1').textContent = '✓ Correct!';
+                document.getElementById('status1').className = 'result-status correct';
+                document.getElementById('result1Container').className = 'result-item correct';
+            } else {
+                document.getElementById('status1').textContent = '✗ Incorrect';
+                document.getElementById('status1').className = 'result-status incorrect';
+                document.getElementById('result1Container').className = 'result-item incorrect';
+                document.getElementById('correct1').style.display = 'block';
+                document.getElementById('correctAnswer1').textContent = correctAnswers.question1.correctAnswerText;
+            }
+
+            // Check Question 2
+            const isQ2Correct = answer2 === correctAnswers.question2.correctOption;
+            if (isQ2Correct) {
+                score++;
+                document.getElementById('status2').textContent = '✓ Correct!';
+                document.getElementById('status2').className = 'result-status correct';
+                document.getElementById('result2Container').className = 'result-item correct';
+            } else {
+                document.getElementById('status2').textContent = '✗ Incorrect';
+                document.getElementById('status2').className = 'result-status incorrect';
+                document.getElementById('result2Container').className = 'result-item incorrect';
+                document.getElementById('correct2').style.display = 'block';
+                document.getElementById('correctAnswer2').textContent = correctAnswers.question2.correctAnswerText;
+            }
+
+            // Display answers
+            document.getElementById('result1').textContent = answer1 || 'No answer provided';
+            document.getElementById('result2').textContent = `Option ${answer2}: ${answer2Element.nextElementSibling.textContent}`;
+
+            // Display score
+            const percentage = (score / 2 * 100).toFixed(0);
+            document.getElementById('scoreDisplay').textContent = `${score}/2`;
+            document.getElementById('scorePercentage').textContent = `${percentage}% Correct`;
+
+            // Show result page
+            document.getElementById('quizPage').classList.add('hidden');
+            document.getElementById('resultPage').classList.remove('hidden');
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // Function to restart the quiz
+        function restartQuiz() {
+            // Clear answers
+            document.getElementById('answer1').value = '';
+            const radioButtons = document.querySelectorAll('input[name="question2"]');
+            radioButtons.forEach(radio => radio.checked = false);
+
+            // Hide correct answer sections
+            document.getElementById('correct1').style.display = 'none';
+            document.getElementById('correct2').style.display = 'none';
+
+            // Reset result containers
+            document.getElementById('result1Container').className = 'result-item';
+            document.getElementById('result2Container').className = 'result-item';
+
+            // Show welcome page
+            document.getElementById('resultPage').classList.add('hidden');
+            document.getElementById('welcomePage').classList.remove('hidden');
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>
